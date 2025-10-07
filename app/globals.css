@@ -12,11 +12,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Định nghĩa biến màu cho chế độ tối KHI CÓ CLASS .dark */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
