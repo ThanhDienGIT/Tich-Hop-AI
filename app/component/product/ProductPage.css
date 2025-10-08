@@ -1,0 +1,51 @@
+/* app/styles/ProductPage.css */
+
+.product-frame {
+  position: relative;
+  /* Giảm padding để khung mỏng hơn */
+  padding: 4px; 
+  border-radius: 12px; 
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  height: 100%;
+  /* Thêm margin-top để có không gian cho nhãn */
+  margin-top: 10px; 
+}
+
+/* --- Khung Shopee --- */
+.shopee-frame {
+  background: linear-gradient(to bottom, #ee4d2d, #ffc107);
+}
+
+.shopee-frame .platform-label {
+  background-color: #ee4d2d;
+}
+
+/* --- Khung Tiktok --- */
+.tiktok-frame {
+  background: linear-gradient(to bottom right, #000000, #25f4ee);
+}
+
+.tiktok-frame .platform-label {
+  background-color: #000000;
+}
+
+/* --- Nhãn tên nền tảng (Shopee/Tiktok) --- */
+.platform-label {
+  position: absolute;
+  /* Đẩy nhãn ra bên ngoài khung viền */
+  top: -16px; 
+  left: 16px;
+  color: white;
+  padding: 2px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  /* Bo tròn tất cả các góc */
+  border-radius: 6px; 
+  z-index: 10;
+}
+
+.product-frame .ant-card {
+  border-radius: 6px;
+  height: 100%;
+}

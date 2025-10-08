@@ -37,7 +37,6 @@ export default function RootLayout({
             <Header />
             <main>{children}</main>
             <Footer />
-            <div>hehe</div>
           </Providers>
         </AntdRegistry>
       </body>
