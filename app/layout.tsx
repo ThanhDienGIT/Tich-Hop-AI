@@ -5,6 +5,7 @@ import Header from "./component/Header";
 import Footer from "./component/Footer";
 import { ThemeProvider } from "next-themes";
 import { Providers } from "./Provider";
+import { AntdRegistry } from "@ant-design/nextjs-registry"; // <-- 1. Import AntdRegistry
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +32,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </Providers>
+        <AntdRegistry>
+          <Providers>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <div>hehe</div>
+          </Providers>
+        </AntdRegistry>
       </body>
     </html>
   );
