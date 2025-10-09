@@ -3,8 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --backgroundHeader:#70d1e2;
-  --textHeader:hsl(0, 0%, 100%);
+  --backgroundHeader:#e6e6e6;
+  --textHeader:hsl(0, 0%, 19%);
 }
 
 

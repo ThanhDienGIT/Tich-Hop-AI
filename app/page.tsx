@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Row, Col, Input, Select, Slider, Radio, Card, Typography, Space, Rate, Button, Badge } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import Banner from './component/Banner';
 
 // Bỏ các import không cần thiết, di chuyển type vào đây
 // import './styles/ProductPage.css'; // Bỏ, không cần file CSS nữa
@@ -29,7 +30,7 @@ export type Product = {
 
 // --- Dữ liệu giả lập (thêm trường discount) ---
 const mockProducts: Product[] = [
-  { id: 1, name: 'Tai nghe Bluetooth Pro chống ồn', type: 'electronics', price: 1250000, sold: 1200, rating: 4.5, image: 'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m7e1mjy07sc3da.webp', platform: 'shopee', discount: 45 },
+  { id: 1, name: 'Tai nghe Bluetooth Pro chống ồn ', type: 'electronics', price: 1250000, sold: 1200, rating: 4.5, image: 'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m7e1mjy07sc3da.webp', platform: 'shopee', discount: 45 },
   { id: 2, name: 'Áo thun Cotton 100% thoáng mát', type: 'fashion', price: 250000, sold: 5000, rating: 5, image: '/images/tshirt.jpg', platform: 'tiktok' },
   { id: 3, name: 'Bàn phím cơ RGB Kailh Switch', type: 'electronics', price: 2100000, sold: 800, rating: 4.8, image: '/images/keyboard.jpg', platform: 'shopee', discount: 20 },
   { id: 4, name: 'Nồi chiên không dầu 5L Lock&Lock', type: 'appliances', price: 1800000, sold: 2500, rating: 4.7, image: '/images/airfryer.jpg', platform: 'generic' },
@@ -64,10 +65,12 @@ export default function Home() {
   }, [searchTerm, selectedType, priceRange, sortOrder]);
 
   return (
-    <main className="max-w-screen-2xl mx-auto p-4 md:p-8">
-      <Row gutter={[32, 32]}>
+    <main className="max-w-screen-2xl mx-auto">
+
+      <Banner/>
+      <Row gutter={[32, 32]} style={{marginTop:20,marginBottom:20}}>
         {/* === CỘT BỘ LỌC === */}
-        <Col xs={24} lg={6} xl={5} xxl={4}>
+        <Col xs={24} lg={6} xl={4} xxl={4}>
           <Card title="Bộ lọc tìm kiếm">
             {/* ... Nội dung bộ lọc không đổi ... */}
             <Space direction="vertical" style={{ width: '100%' }} size="large">
@@ -102,7 +105,7 @@ export default function Home() {
         </Col>
 
         {/* === CỘT DANH SÁCH SẢN PHẨM === */}
-        <Col xs={24} lg={18} xl={19} xxl={20}>
+        <Col xs={24} lg={20} xl={20} xxl={20}>
           <Row gutter={[16, 16]}>
             {filteredAndSortedProducts.length > 0 ? (
               filteredAndSortedProducts.map(product => {
@@ -118,7 +121,6 @@ export default function Home() {
                           alt={product.name}
                           src={product.image}
                           fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           style={{ objectFit: 'contain', padding: '8px' }}
                         />
                       </div>

@@ -22,8 +22,6 @@ function Header() {
           style={{
             maxWidth: "1200px",
             width: "100%",
-            padding: "10px 0",
-            marginBottom: "20px",
           }}
         >
           <Flex vertical gap="small" style={{ width: "100%" }}>
@@ -32,8 +30,6 @@ function Header() {
           </Flex>
         </div>
       </header>
-
-      <Divider style={{ margin: 0 }} />
     </>
   );
 }
