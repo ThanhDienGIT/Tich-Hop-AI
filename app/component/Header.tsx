@@ -26,7 +26,7 @@ function Header() {
         >
           <Flex vertical gap="small" style={{ width: "100%" }}>
             <TopBar />
-            <SearchBox />
+          
           </Flex>
         </div>
       </header>
