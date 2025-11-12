@@ -21,6 +21,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'down-vn.img.susercontent.com',
       },
+      {
+        protocol: 'https', // Must match the protocol of your image URL
+        hostname: 'placehold.co', // The domain you want to allow
+        // Optional: pathname and port can be specified for more granular control
+      }
       // Thêm các domain khác bạn muốn cho phép ở đây
     ],
   },

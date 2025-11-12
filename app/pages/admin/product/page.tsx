@@ -18,7 +18,8 @@ import {
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 // Import instance Axios của bạn
 // Đảm bảo đường dẫn này chính xác
-import { instance } from '../../../service/http/instance'; 
+import { instance } from '../../../service/http/instance';
+import axios from 'axios';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -98,22 +99,49 @@ const ProductManager: React.FC = () => {
   // Xử lý submit form (đã dùng instance)
   const handleFormSubmit = async (values: any) => {
     setLoading(true);
-    
+
     let imageUrl = values.image;
     if (Array.isArray(values.image) && values.image.length > 0) {
       imageUrl = values.image[0].url || values.image[0].name;
     }
 
-    const productData = { ...values, image: imageUrl };
+    const productData = { ...values };
+
+    console.log('productData', productData);
 
     try {
-      let response;
-      if (editingProduct) {
-        // ĐÃ THAY THẾ: .put() thay vì fetch()
-        response = await instance.put(`/product/${editingProduct.id}`, productData);
-      } else {
-        // ĐÃ THAY THẾ: .post() thay vì fetch()
-        response = await instance.post('/product', productData);
+
+      // BƯỚC 2: Chuẩn bị FormData (chính là "nối chuỗi" của bạn)
+      const formData = new FormData();
+      formData.append('file', productData.image[0].originFileObj);
+      // Lấy API Key public từ biến môi trường
+      formData.append("cloud_name", 'dwlkzg4fr');
+      formData.append('api_key', '156551575813272');
+      formData.append("upload_preset", 'ml_upload');
+
+      // BƯỚC 3: Gọi thẳng API Cloudinary
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const url = `https://api.cloudinary.com/v1_1/dwlkzg4fr/auto/upload`;
+
+      // Dùng instance (axios) của bạn để có 'onProgress'
+      // const response = await instance.post(url, formData, {
+      const response2 = await axios.post(url, formData);
+
+      console.log('response2', response2);
+
+      if (response2.status == 200) {
+        let response;
+
+        productData.image = response2.data.url
+        productData.image_id = response2.data.public_id
+
+        if (editingProduct) {
+          // ĐÃ THAY THẾ: .put() thay vì fetch()
+          response = await instance.put(`/product/${editingProduct.id}`, productData);
+        } else {
+          // ĐÃ THAY THẾ: .post() thay vì fetch()
+          response = await instance.post('/product', productData);
+        }
       }
 
       message.success(editingProduct ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm thành công!');
@@ -134,7 +162,7 @@ const ProductManager: React.FC = () => {
     try {
       // ĐÃ THAY THẾ: .delete() thay vì fetch()
       await instance.delete(`/product/${id}`);
-      
+
       message.success('Xóa sản phẩm thành công!');
       fetchProducts(); // Tải lại danh sách
     } catch (error: any) {
@@ -208,7 +236,7 @@ const ProductManager: React.FC = () => {
       >
         Thêm sản phẩm mới
       </Button>
-      
+
       <Spin spinning={loading}>
         <Table
           columns={columns}
@@ -272,7 +300,7 @@ const ProductManager: React.FC = () => {
           >
             <Input placeholder="1.250.000 vnđ - 2.500.000 vnđ" />
           </Form.Item>
-          
+
           <Form.Item
             name="image"
             label="Ảnh"
@@ -301,23 +329,23 @@ const ProductManager: React.FC = () => {
           </Form.Item>
 
           <Space>
-             <Form.Item
+            <Form.Item
               name="countSale"
               label="Số lượng đã bán"
               rules={[{ type: 'number', min: 0 }]}
             >
               <InputNumber />
             </Form.Item>
-            
-             <Form.Item
+
+            <Form.Item
               name="countEvaluate"
               label="Số lượng đánh giá"
               rules={[{ type: 'number', min: 0 }]}
             >
               <InputNumber />
             </Form.Item>
-            
-             <Form.Item
+
+            <Form.Item
               name="start"
               label="Số sao (0-5)"
               rules={[{ type: 'number', min: 0, max: 5 }]}

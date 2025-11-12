@@ -67,6 +67,9 @@ export default function Home() {
       try {
         // Sử dụng instance axios để gọi API
         const response = await instance.get('/product');
+
+        console.log(response);
+
         setAllProducts(response.data || []);
       } catch (error: any) {
         console.error("Fetch products error:", error);
@@ -125,19 +128,17 @@ export default function Home() {
         {/* === CỘT BỘ LỌC === */}
         <Col xs={24} lg={6} xl={4} xxl={4}>
           <Card title="Bộ lọc tìm kiếm">
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              
-
-              <Input.Search
+            <Space.Compact direction="vertical" style={{ width: '100%' }} size="large">
+              <Input
                 placeholder="Tên sản phẩm..."
-                onSearch={value => setSearchTerm(value)}
                 onChange={e => setSearchTerm(e.target.value)}
                 allowClear
+                style={{ marginBottom: '10px' }} 
               />
               {/* Sửa Select để dùng `productTypes` (số) */}
               <Select 
                 defaultValue="all" 
-                style={{ width: '100%' }} 
+                style={{ width: '100%',marginBottom: '10px' }} 
                 onChange={value => setSelectedType(value)}
               >
                 <Option value="all">Tất cả danh mục</Option>
@@ -169,7 +170,7 @@ export default function Home() {
                   </Space>
                 </Radio.Group>
               </div>
-            </Space>
+            </Space.Compact>
           </Card>
         </Col>
 
@@ -190,11 +191,11 @@ export default function Home() {
                         <div style={{ aspectRatio: '1 / 1', position: 'relative' }}>
                           <Image
                             alt={product.name}
-                            src={product.image || 'https://placehold.co/300x300?text=Image'} // Thêm ảnh fallback
+                            src={product.image || ''} // Thêm ảnh fallback
                             fill
                             style={{ objectFit: 'contain', padding: '8px' }}
                             // Xử lý lỗi nếu ảnh từ API bị hỏng
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/300x300?text=Error'; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://cdn.dribbble.com/userupload/22076800/file/original-8e7ce77dec0edaf0105e8287038f6e60.gif'; }}
                           />
                         </div>
                       }

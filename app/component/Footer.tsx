@@ -31,7 +31,7 @@ function Footer() {
         {/* xs={24}: Trên màn hình siêu nhỏ, cột chiếm 24/24 (full width) */}
         {/* lg={10}: Trên màn hình lớn, cột chiếm 10/24 */}
         <Col xs={24} md={12} lg={10}>
-          <Title level={4} style={{ color: 'white' }}>Về Chúng Tôi</Title>
+          <Title level={4} style={{ color: 'black' }}>Về Chúng Tôi</Title>
           <Paragraph style={{  color: 'var(--color-header)' }}>
             &copy; {new Date().getFullYear()} CyberTrust. All Rights Reserved.
           </Paragraph>
@@ -50,7 +50,7 @@ function Footer() {
 
         {/* === Cột Form Liên Hệ === */}
         <Col xs={24} md={12} lg={10}>
-          <Title level={4} style={{ color: 'white' }}>Gửi Câu Hỏi Cho Chúng Tôi</Title>
+          <Title level={4} style={{ color: 'black' }}>Gửi Câu Hỏi Cho Chúng Tôi</Title>
           <Form
             form={form}
             name="contact"
@@ -61,7 +61,7 @@ function Footer() {
             autoComplete="off"
           >
             <Form.Item
-              label={<Text style={{ color: 'white' }}>Họ và Tên</Text>}
+              label={<Text style={{ color: 'black' }}>Họ và Tên</Text>}
               name="name"
               rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
             >
@@ -69,7 +69,7 @@ function Footer() {
             </Form.Item>
 
             <Form.Item
-              label={<Text style={{ color: 'white' }}>Email</Text>}
+              label={<Text style={{ color: 'black' }}>Email</Text>}
               name="email"
               rules={[
                 { required: true, message: 'Vui lòng nhập email!' },
@@ -80,14 +80,14 @@ function Footer() {
             </Form.Item>
             
             <Form.Item
-              label={<Text style={{ color: 'white' }}>Số điện thoại (không bắt buộc)</Text>}
+              label={<Text style={{ color: 'black' }}>Số điện thoại (không bắt buộc)</Text>}
               name="phone"
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              label={<Text style={{ color: 'white' }}>Câu hỏi của bạn</Text>}
+              label={<Text style={{ color: 'black' }}>Câu hỏi của bạn</Text>}
               name="question"
               rules={[{ required: true, message: 'Vui lòng nhập câu hỏi của bạn!' }]}
             >

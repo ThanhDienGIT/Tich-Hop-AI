@@ -2,9 +2,10 @@
 
 import React from "react";
 // Import thêm Button, Space và SearchOutlined
-import { Col, Flex, Image, Input, Button, Space } from "antd"; 
+import { Col, Flex, Image, Input, Button, Space } from "antd";
 import { SearchOutlined } from '@ant-design/icons'; // Icon cho nút tìm kiếm
 import logo from "../../asset/image/logo.png"; // Giữ nguyên đường dẫn logo của bạn
+import Link from "next/link";
 
 function SearchBox() {
   // State để lưu giá trị tìm kiếm
@@ -17,9 +18,11 @@ function SearchBox() {
 
   return (
     // Thêm padding cho SearchBox
-    <Flex gap="middle" align="center" justify="space-between" style={{width: '100%', padding: '24px'}}>
+    <Flex gap="middle" align="center" justify="space-between" style={{ width: '100%', padding: '24px' }}>
       <Col>
-        <Image src={logo.src} alt="logo" width={150} preview={false} />
+        <Link href={'/'}>
+          <Image src={logo.src} alt="logo" width={150} preview={false} />
+        </Link>
       </Col>
 
       <Col flex={1}>
@@ -32,9 +35,9 @@ function SearchBox() {
             onChange={(e) => setSearchTerm(e.target.value)}
             onPressEnter={() => handleSearch(searchTerm)} // Cho phép tìm bằng Enter
           />
-          <Button 
-            type="primary" 
-            size="large" 
+          <Button
+            type="primary"
+            size="large"
             icon={<SearchOutlined />}
             onClick={() => handleSearch(searchTerm)} // Tìm khi click nút
           />
