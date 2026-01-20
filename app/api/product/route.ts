@@ -3,11 +3,16 @@ import { NextResponse } from "next/server";
 import { database } from "../../service/firebase/firebaseConfig"; 
 import { ref, get, set, push, serverTimestamp } from "firebase/database";
 
-const productsRef = ref(database, 'products');
-
 // GET: Lấy tất cả sản phẩm
 export async function GET() {
   try {
+    
+    if (!database) {
+      return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
+    }
+
+    const productsRef = ref(database, 'products');
+      
     const snapshot = await get(productsRef);
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -30,7 +35,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const productData = await request.json();
-    
+    const productsRef = ref(database!, 'products');
     // Tạo một ID mới bằng push()
     const newProductRef = push(productsRef);
     

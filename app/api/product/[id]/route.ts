@@ -4,7 +4,7 @@ import { database } from "../../../service/firebase/firebaseConfig";
 import { ref, get, update, remove } from "firebase/database";
 
 // Helper function để lấy ref sản phẩm
-const getProductRef = (id: string) => ref(database, `products/${id}`);
+const getProductRef = (id: string) => ref(database!, `products/${id}`);
 
 /**
  * GET: Lấy một sản phẩm theo ID
