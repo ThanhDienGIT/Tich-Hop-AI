@@ -1,13 +1,5 @@
-import { initializeApp, getApp, getApps } from "firebase/app";
-import { getDatabase } from "firebase/database";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage"; 
- 
-// import { getAnalytics } from "firebase/analytics";
+// ... các dòng import giữ nguyên
 
-// Đọc các biến môi trường từ file .env.local
-// Đây là cách làm an toàn và chuẩn cho Next.js
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -19,18 +11,20 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// --- Khởi tạo (Singleton Pattern) ---
-// Kiểm tra xem app đã được khởi tạo chưa, nếu chưa thì mới khởi tạo
-// Điều này ngăn lỗi "Firebase app named '[DEFAULT]' already exists" trong Next.js dev mode
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// 1. Kiểm tra biến quan trọng nhất trước khi khởi tạo
+if (!firebaseConfig.databaseURL && typeof window !== 'undefined') {
+    console.warn("Firebase Database URL is missing. Check your .env.local file.");
+}
 
-// Khởi tạo các dịch vụ bạn cần
-// Chúng ta export các service này để gọi ở bất kỳ đâu trong app
-const database = getDatabase(app);
+// 2. Singleton Pattern
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+// 3. Khởi tạo các dịch vụ
+// Nếu databaseURL bị thiếu khi build, truyền trực tiếp vào getDatabase để ép buộc nó nhận giá trị
+const database = getDatabase(app, process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL);
+
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
-// const analytics = getAnalytics(app); // Bỏ comment nếu bạn cần dùng Analytics
 
-// Export các dịch vụ đã khởi tạo
-export { app, database, auth, firestore, storage};
+export { app, database, auth, firestore, storage };
