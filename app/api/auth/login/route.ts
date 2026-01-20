@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 // Sử dụng đường dẫn import mới của bạn
-import { database,auth } from "../../../service/firebase/firebaseConfig"; 
-import { ref, get, set, push, serverTimestamp } from "firebase/database";
+import { auth } from "../../../service/firebase/firebaseConfig"; 
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 export async function POST(request: Request) {
