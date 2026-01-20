@@ -17,12 +17,12 @@ const MOCK_SCRAPED_DATA = {
 
 
 // Component Form để thêm sản phẩm
-function ProductAddForm({ onAddProduct }) {
+function ProductAddForm({ onAddProduct } : any) {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null); // Thêm state để báo lỗi
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e : any) => {
     e.preventDefault();
     if (!url) return;
 
@@ -63,7 +63,7 @@ function ProductAddForm({ onAddProduct }) {
       console.log("Đã cào xong:", newData);
       setUrl('');
 
-    } catch (err) {
+    } catch (err : any) {
       console.error("Lỗi khi cào dữ liệu:", err.message);
       setError(err.message); // Hiển thị lỗi cho người dùng
     } finally {
@@ -98,7 +98,13 @@ function ProductAddForm({ onAddProduct }) {
 }
 
 // Component Modal để hiển thị chi tiết sản phẩm
-function ProductDetailModal({ product, onClose }) {
+function ProductDetailModal({ 
+  product, 
+  onClose 
+}: { 
+  product: any; 
+  onClose: () => void 
+}) {
   if (!product) return null;
 
   return (
@@ -175,9 +181,9 @@ export default function ProductAdminPage() {
     // Thêm một sản phẩm mẫu ban đầu
     MOCK_SCRAPED_DATA
   ]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const handleAddProduct = (newProduct) => {
+  const handleAddProduct = (newProduct : any) => {
     setProducts(prevProducts => [newProduct, ...prevProducts]);
   };
 

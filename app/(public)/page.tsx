@@ -23,7 +23,7 @@ export type Product = {
   type: number;       // API trả về số (1, 2, 3)
   urlLink: string;
   price: string;      // API trả về string ("1.250.000 vnđ...")
-  image: string;
+  image: {url:string}[];
   description: string;
   countSale: number;  // API trả về countSale
   countEvaluate: number;
@@ -106,7 +106,7 @@ export default function Home() {
 
     // 3. Lọc theo loại (type) - Đã sửa sang dùng số
     if (selectedType !== 'all') {
-      filtered = filtered.filter(p => p.type == selectedType);
+      filtered = filtered.filter(p => p.type === Number(selectedType));
     }
 
     // 4. Lọc theo khoảng giá (dùng 'numericPrice')
@@ -159,7 +159,7 @@ export default function Home() {
                   min={0}
                   max={MAX_PRICE}
                   defaultValue={[0, MAX_PRICE]}
-                  onChange={(value: [number, number]) => setPriceRange(value)}
+                  onChange={(value: number | number[]) => setPriceRange(value as [number, number])}
                   step={100000}
                   tooltip={{ formatter: value => `${value?.toLocaleString()} ₫` }}
                 />

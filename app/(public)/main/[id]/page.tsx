@@ -5,7 +5,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import { 
   Row, Col, Card, Typography, Space, Rate, Button, 
-  Spin, message, Breadcrumb, Divider, Tag 
+  Spin, message, Breadcrumb, Divider, Tag , Badge
 } from 'antd';
 import { ShoppingCartOutlined, HomeOutlined, TagOutlined } from '@ant-design/icons';
 // Import instance Axios (Đảm bảo đường dẫn này chính xác)
@@ -22,12 +22,12 @@ export type Product = {
   type: number;       
   urlLink: string;
   price: string;      
-  image: string;
   description: string;
   countSale: number;  
   countEvaluate: number;
   start: number;      
   discount?: number; 
+  image: {url:string}[];
 };
 
 // --- Định nghĩa loại sản phẩm (Khớp với file app/page.tsx) ---

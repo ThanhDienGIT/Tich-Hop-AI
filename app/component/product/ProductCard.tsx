@@ -2,9 +2,25 @@
 import React from 'react';
 import Image from 'next/image';
 import { Card, Typography, Rate, Row, Space, Divider } from 'antd';
-import { Product } from '../types';
 
 const { Title, Text } = Typography;
+// --- Cấu trúc dữ liệu Product (Lấy từ file app/page.tsx) ---
+export type Product = {
+  id: string;
+  name: string;
+  type: number;       
+  urlLink: string;
+  price: string;      
+  description: string;
+  countSale: number;  
+  countEvaluate: number;
+  start: number;      
+  discount?: number; 
+  image: {url:string}[];
+  platform: any;
+  rating: number;
+  sold: any;
+};
 
 interface ProductCardProps {
   product: Product;
@@ -40,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           }}>
             <Image
               alt={product.name}
-              src={product.image}
+              src={product.image[0].url}
               fill // Cho ảnh lấp đầy thẻ div cha
               style={{ 
                 objectFit: 'contain', // Thay đổi từ 'cover' sang 'contain'
