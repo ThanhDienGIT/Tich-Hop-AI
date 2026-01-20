@@ -21,10 +21,10 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // 3. Khởi tạo các dịch vụ
 // Nếu databaseURL bị thiếu khi build, truyền trực tiếp vào getDatabase để ép buộc nó nhận giá trị
-const database = getDatabase(app, process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL);
+export const database = getDatabase(app, process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL);
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
 
-export { app, database, auth, firestore, storage };
+export { app, auth, firestore, storage };
