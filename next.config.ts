@@ -25,7 +25,19 @@ const nextConfig = {
         protocol: 'https', // Must match the protocol of your image URL
         hostname: 'placehold.co', // The domain you want to allow
         // Optional: pathname and port can be specified for more granular control
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**', // Cho phép tất cả các đường dẫn ảnh từ host này
+      },
+      {
+        protocol: 'http', // Thêm 'http' vì lỗi của bạn cho thấy 'http'
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**', // Cho phép tất cả các đường dẫn ảnh từ host này
+      },
       // Thêm các domain khác bạn muốn cho phép ở đây
     ],
   },

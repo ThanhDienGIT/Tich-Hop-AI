@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
+import "../globals.css";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
 import { ThemeProvider } from "next-themes";
+import { Providers } from "../Provider";
 import { AntdRegistry } from "@ant-design/nextjs-registry"; // <-- 1. Import AntdRegistry
 
 const geistSans = Geist({
@@ -31,9 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AntdRegistry>
-
+          <Providers>
+            <Header />
             <main>{children}</main>
-   
+            <Footer />
+          </Providers>
         </AntdRegistry>
       </body>
     </html>

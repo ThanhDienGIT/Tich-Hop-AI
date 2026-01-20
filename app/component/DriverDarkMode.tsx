@@ -18,7 +18,8 @@ export const DriverDarkMode = () => {
 
   return (
     <Switch
-      checked={theme === "dark"}
+      defaultChecked={true}
+      checked={theme === "light"}
       onChange={toggleTheme}
       checkedChildren={<MoonOutlined />}
       unCheckedChildren={<SunOutlined />}

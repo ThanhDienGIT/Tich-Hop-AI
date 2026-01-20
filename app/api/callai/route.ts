@@ -14,13 +14,22 @@ const ai = new GoogleGenAI({
 
 export async function POST(request: Request) {
   try {
-    const { prompt } = await request.json();
+    const { prompt, codeContext } = await request.json();
+
+      const finalPrompt = `
+      Dựa vào đoạn code sau đây làm ngữ cảnh:
+      --- START CODE CONTEXT ---
+      ${codeContext}
+      --- END CODE CONTEXT ---
+
+      Hãy thực hiện yêu cầu sau: ${prompt}
+    `;
+
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: prompt,
+      contents: finalPrompt,
     });
-    console.log(response.text);
 
     const data = {
       message: response.text,

@@ -41,7 +41,6 @@ const productTypes = [
 // (Tái sử dụng một phần logic từ trang Home)
 const RelatedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const router = useRouter();
-  
   const cardContent = (
     <Card
       hoverable
@@ -51,7 +50,7 @@ const RelatedProductCard: React.FC<{ product: Product }> = ({ product }) => {
         <div style={{ aspectRatio: '1 / 1', position: 'relative' }}>
           <Image
             alt={product.name}
-            src={product.image || 'https://placehold.co/300x300?text=Image'}
+            src={product.image[0].url || 'https://placehold.co/300x300?text=Image'}
             fill
             style={{ objectFit: 'contain', padding: '8px' }}
             onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/300x300?text=Error'; }}
@@ -175,7 +174,7 @@ function ProductDetailPage() {
             <div style={{ aspectRatio: '1 / 1', position: 'relative', border: '1px solid #f0f0f0', borderRadius: '8px', overflow: 'hidden' }}>
               <Image
                 alt={product.name}
-                src={product.image || 'https://placehold.co/600x600?text=Image'}
+                src={product.image[0].url || 'https://placehold.co/600x600?text=Image'}
                 fill
                 style={{ objectFit: 'contain', padding: '16px' }}
                 onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/600x600?text=Error'; }}
@@ -242,11 +241,12 @@ function ProductDetailPage() {
         <Card>
           <Title level={3}>SẢN PHẨM LIÊN QUAN</Title>
           <Row gutter={[16, 16]}>
-            {relatedProducts.map(relProduct => (
+            {relatedProducts.map(relProduct => { 
+              return(
               <Col key={relProduct.id} xs={24} sm={12} md={8} lg={6} xl={4}>
                 <RelatedProductCard product={relProduct} />
               </Col>
-            ))}
+            )})}
           </Row>
         </Card>
       )}

@@ -2,7 +2,8 @@ import { initializeApp, getApp, getApps } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getStorage } from "firebase/storage"; 
+ 
 // import { getAnalytics } from "firebase/analytics";
 
 // Đọc các biến môi trường từ file .env.local
@@ -32,4 +33,4 @@ const storage = getStorage(app);
 // const analytics = getAnalytics(app); // Bỏ comment nếu bạn cần dùng Analytics
 
 // Export các dịch vụ đã khởi tạo
-export { app, database, auth, firestore, storage };
+export { app, database, auth, firestore, storage};

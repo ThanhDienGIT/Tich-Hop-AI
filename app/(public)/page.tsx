@@ -2,15 +2,16 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { 
-  Row, Col, Input, Select, Slider, Radio, Card, 
-  Typography, Space, Button, Badge, Spin, message 
+import {
+  Row, Col, Input, Select, Slider, Radio, Card,
+  Typography, Space, Button, Badge, Spin, message
 } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import Banner from './component/Banner';
+import Banner from '../component/Banner';
 // Import instance Axios (ĐÃ SỬA ĐƯỜNG DẪN theo yêu cầu của bạn)
-import { instance } from './service/http/instance'; 
-
+import { instance } from '../service/http/instance';
+import Link from 'next/link';
+import {isToken} from '../service/token/checkToken';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
@@ -27,7 +28,7 @@ export type Product = {
   countSale: number;  // API trả về countSale
   countEvaluate: number;
   start: number;      // API trả về start (thay cho rating)
-  discount?: number; 
+  discount?: number;
 };
 
 // --- Định nghĩa loại sản phẩm (Khớp với Admin và API) ---
@@ -51,6 +52,9 @@ const parsePrice = (priceStr: string): number => {
   return isNaN(priceNum) ? 0 : priceNum;
 };
 
+
+
+
 export default function Home() {
   // --- STATE ---
   const [allProducts, setAllProducts] = useState<Product[]>([]); // State chứa data từ API
@@ -62,6 +66,7 @@ export default function Home() {
 
   // --- EFFECT: GỌI API LẤY DỮ LIỆU ---
   useEffect(() => {
+
     const fetchProducts = async () => {
       setLoading(true);
       try {
@@ -85,28 +90,28 @@ export default function Home() {
 
   // --- MEMO: LỌC VÀ SẮP XẾP SẢN PHẨM ---
   const filteredAndSortedProducts = useMemo(() => {
-    
+
     let filtered = allProducts
       // 1. Phân tích giá (parse price)
       .map(p => ({
         ...p,
         // Thêm trường 'numericPrice' để lọc và sắp xếp
-        numericPrice: parsePrice(p.price) 
+        numericPrice: parsePrice(p.price)
       }));
-      
+
     // 2. Lọc theo tên
     if (searchTerm) {
       filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-    
+
     // 3. Lọc theo loại (type) - Đã sửa sang dùng số
     if (selectedType !== 'all') {
-      filtered = filtered.filter(p => p.type === selectedType);
+      filtered = filtered.filter(p => p.type == selectedType);
     }
-    
+
     // 4. Lọc theo khoảng giá (dùng 'numericPrice')
     filtered = filtered.filter(p => p.numericPrice >= priceRange[0] && p.numericPrice <= priceRange[1]);
-    
+
     // 5. Sắp xếp (dùng 'numericPrice')
     if (sortOrder === 'asc') {
       return [...filtered].sort((a, b) => a.numericPrice - b.numericPrice);
@@ -114,17 +119,17 @@ export default function Home() {
     if (sortOrder === 'desc') {
       return [...filtered].sort((a, b) => b.numericPrice - a.numericPrice);
     }
-    
+
     return filtered;
-    
+
   }, [allProducts, searchTerm, selectedType, priceRange, sortOrder]);
 
 
   return (
     <main className="max-w-screen-2xl mx-auto">
 
-      <Banner/>
-      <Row gutter={[32, 32]} style={{marginTop:20,marginBottom:20}}>
+      <Banner />
+      <Row gutter={[32, 32]} style={{ marginTop: 20, marginBottom: 20 }}>
         {/* === CỘT BỘ LỌC === */}
         <Col xs={24} lg={6} xl={4} xxl={4}>
           <Card title="Bộ lọc tìm kiếm">
@@ -133,12 +138,12 @@ export default function Home() {
                 placeholder="Tên sản phẩm..."
                 onChange={e => setSearchTerm(e.target.value)}
                 allowClear
-                style={{ marginBottom: '10px' }} 
+                style={{ marginBottom: '10px' }}
               />
               {/* Sửa Select để dùng `productTypes` (số) */}
-              <Select 
-                defaultValue="all" 
-                style={{ width: '100%',marginBottom: '10px' }} 
+              <Select
+                defaultValue="all"
+                style={{ width: '100%', marginBottom: '10px' }}
                 onChange={value => setSelectedType(value)}
               >
                 <Option value="all">Tất cả danh mục</Option>
@@ -146,20 +151,20 @@ export default function Home() {
                   <Option key={type.value} value={type.value}>{type.label}</Option>
                 ))}
               </Select>
-              
+
               <div>
                 <Text>Khoảng giá</Text>
-                <Slider 
-                  range 
-                  min={0} 
-                  max={MAX_PRICE} 
-                  defaultValue={[0, MAX_PRICE]} 
-                  onChange={(value: [number, number]) => setPriceRange(value)} 
-                  step={100000} 
+                <Slider
+                  range
+                  min={0}
+                  max={MAX_PRICE}
+                  defaultValue={[0, MAX_PRICE]}
+                  onChange={(value: [number, number]) => setPriceRange(value)}
+                  step={100000}
                   tooltip={{ formatter: value => `${value?.toLocaleString()} ₫` }}
                 />
               </div>
-              
+
               <div>
                 <Text>Sắp xếp theo</Text>
                 <Radio.Group onChange={e => setSortOrder(e.target.value)} value={sortOrder}>
@@ -182,52 +187,56 @@ export default function Home() {
               {filteredAndSortedProducts.length > 0 ? (
                 filteredAndSortedProducts.map(product => {
                   // --- LOGIC CỦA PRODUCT CARD ĐƯỢC GỘP VÀO ĐÂY ---
+
                   const cardContent = (
-                    <Card
-                      hoverable
-                      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                  
-                      cover={
-                        <div style={{ aspectRatio: '1 / 1', position: 'relative' }}>
-                          <Image
-                            alt={product.name}
-                            src={product.image || ''} // Thêm ảnh fallback
-                            fill
-                            style={{ objectFit: 'contain', padding: '8px' }}
-                            // Xử lý lỗi nếu ảnh từ API bị hỏng
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://cdn.dribbble.com/userupload/22076800/file/original-8e7ce77dec0edaf0105e8287038f6e60.gif'; }}
-                          />
-                        </div>
-                      }
-                    >
-                      <div>
-                        <Title level={5} ellipsis={{ rows: 2, tooltip: product.name }}>
-                          {product.name}
-                        </Title>
-                        <Row justify="space-between" align="middle" style={{ margin: '8px 0' }}>
-                          <Text strong style={{ color: '#d70018', fontSize: '1rem' }}>
-                            {/* Hiển thị giá (string) trực tiếp từ API */}
-                            {product.price}
-                          </Text>
-                          <Text type="secondary" style={{ fontSize: '0.8rem' }}>
-                            {/* Sửa 'sold' thành 'countSale' */}
-                            Đã bán {product.countSale > 1000 ? `${(product.countSale/1000).toFixed(1)}k` : product.countSale}
-                          </Text>
-                        </Row>
-                      </div>
-                      <Button
-                        type="primary"
-                        danger
-                        icon={<ShoppingCartOutlined />}
-                        style={{ width: '100%', marginTop: 'auto' }}
-                        // Mở link sản phẩm khi click
-                        href={product.urlLink}
-                        target="_blank" 
-                        rel="noopener noreferrer"
+
+                    <Link href={`/main/${product.id}`}>
+                      <Card
+                        hoverable
+                        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+
+                        cover={
+                          <div style={{ aspectRatio: '1 / 1', position: 'relative' }}>
+                            <Image
+                              alt={product.name}
+                              src={product.image[0].url || ''} // Thêm ảnh fallback
+                              fill
+                              style={{ objectFit: 'contain', padding: '8px' }}
+                              // Xử lý lỗi nếu ảnh từ API bị hỏng
+                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://cdn.dribbble.com/userupload/22076800/file/original-8e7ce77dec0edaf0105e8287038f6e60.gif'; }}
+                            />
+                          </div>
+                        }
                       >
-                        Mua ngay
-                      </Button>
-                    </Card>
+                        <div>
+                          <Title level={5} ellipsis={{ rows: 2, tooltip: product.name }}>
+                            {product.name}
+                          </Title>
+                          <Row justify="space-between" align="middle" style={{ margin: '8px 0' }}>
+                            <Text strong style={{ color: '#d70018', fontSize: '1rem' }}>
+                              {/* Hiển thị giá (string) trực tiếp từ API */}
+                              {product.price}
+                            </Text>
+                            <Text type="secondary" style={{ fontSize: '0.8rem' }}>
+                              {/* Sửa 'sold' thành 'countSale' */}
+                              Đã bán {product.countSale > 1000 ? `${(product.countSale / 1000).toFixed(1)}k` : product.countSale}
+                            </Text>
+                          </Row>
+                        </div>
+                        <Button
+                          type="primary"
+                          danger
+                          icon={<ShoppingCartOutlined />}
+                          style={{ width: '100%', marginTop: 'auto' }}
+                          // Mở link sản phẩm khi click
+                          href={product.urlLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Mua ngay
+                        </Button>
+                      </Card>
+                    </Link>
                   );
 
                   return (

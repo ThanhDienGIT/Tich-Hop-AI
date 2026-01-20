@@ -9,7 +9,7 @@ const { Title, Paragraph } = Typography;
 // Style chung cho các slide, bạn có thể tùy chỉnh
 const contentStyle: React.CSSProperties = {
 
-  height: '450px', // Chiều cao của banner
+  height: '350px', // Chiều cao của banner
   color: '#fff',
   display: 'flex',
   flexDirection: 'column',
@@ -18,6 +18,7 @@ const contentStyle: React.CSSProperties = {
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   position: 'relative',
+  
 };
 
 // Lớp phủ màu tối để làm nổi bật chữ

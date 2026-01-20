@@ -11,17 +11,19 @@ const getProductRef = (id: string) => ref(database, `products/${id}`);
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  // Sửa ở đây: params là Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productRef = getProductRef(params.id);
+    // Sửa ở đây: cần await params trước khi dùng
+    const { id } = await params;
+    
+    const productRef = getProductRef(id);
     const snapshot = await get(productRef);
 
     if (snapshot.exists()) {
-      // Trả về dữ liệu sản phẩm bao gồm cả ID
       return NextResponse.json({ id: snapshot.key, ...snapshot.val() });
     } else {
-      // Trả về lỗi 404 nếu không tìm thấy
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
   } catch (error) {
@@ -35,11 +37,13 @@ export async function GET(
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  // Sửa ở đây: params là Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params; // await params
     const productData = await request.json();
-    const productRef = getProductRef(params.id);
+    const productRef = getProductRef(id);
 
     // Kiểm tra xem sản phẩm có tồn tại không trước khi update
     const snapshot = await get(productRef);
@@ -48,13 +52,12 @@ export async function PUT(
     }
 
     // Xóa trường ID khỏi data (không lưu ID bên trong chính nó)
-    delete productData.id; 
+    if (productData.id) delete productData.id; 
 
     // Thực hiện cập nhật
     await update(productRef, productData);
     
-    // Trả về dữ liệu đã cập nhật
-    return NextResponse.json({ message: "Product updated successfully", id: params.id, ...productData });
+    return NextResponse.json({ message: "Product updated successfully", id: id, ...productData });
   } catch (error) {
     console.error("Error updating product:", error);
     return NextResponse.json({ message: "Failed to update product" }, { status: 500 });
@@ -66,10 +69,12 @@ export async function PUT(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  // Sửa ở đây: params là Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productRef = getProductRef(params.id);
+    const { id } = await params; // await params
+    const productRef = getProductRef(id);
 
     // Kiểm tra xem sản phẩm có tồn tại không trước khi xóa
     const snapshot = await get(productRef);
