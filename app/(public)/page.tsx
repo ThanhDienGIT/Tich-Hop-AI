@@ -11,7 +11,6 @@ import Banner from '../component/Banner';
 // Import instance Axios (ĐÃ SỬA ĐƯỜNG DẪN theo yêu cầu của bạn)
 import { instance } from '../service/http/instance';
 import Link from 'next/link';
-import {isToken} from '../service/token/checkToken';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
