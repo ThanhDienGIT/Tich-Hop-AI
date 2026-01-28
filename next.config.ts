@@ -38,7 +38,9 @@ const nextConfig = {
         port: '',
         pathname: '/**', // Cho phép tất cả các đường dẫn ảnh từ host này
       },
-      
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'gw.alipayobjects.com' },
+      { protocol: 'https', hostname: 'placehold.co' }
       // Thêm các domain khác bạn muốn cho phép ở đây
     ],
     
