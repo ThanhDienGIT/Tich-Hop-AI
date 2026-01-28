@@ -8,14 +8,11 @@ import {
   Spin, message, Breadcrumb, Divider, Tag , Badge
 } from 'antd';
 import { ShoppingCartOutlined, HomeOutlined, TagOutlined } from '@ant-design/icons';
-// Import instance Axios (Đảm bảo đường dẫn này chính xác)
-// Đường dẫn này được điều chỉnh dựa trên cấu trúc `app/product/[id]/page.tsx`
 import { instance } from '../../../service/http/instance'; 
+
 const { Title, Text, Paragraph } = Typography;
 
-
-
-// --- Cấu trúc dữ liệu Product (Lấy từ file app/page.tsx) ---
+// --- 1. ĐỒNG BỘ TYPE PRODUCT (Quan trọng: image là string) ---
 export type Product = {
   id: string;
   name: string;
@@ -27,53 +24,54 @@ export type Product = {
   countEvaluate: number;
   start: number;      
   discount?: number; 
-  image: {url:string}[];
+  image: string; // Đã đổi từ array sang string để khớp với API và trang Home
 };
 
-// --- Định nghĩa loại sản phẩm (Khớp với file app/page.tsx) ---
 const productTypes = [
   { value: 1, label: 'Affiliate' },
   { value: 2, label: 'Khóa học' },
   { value: 3, label: 'Dịch vụ' },
 ];
 
+// --- Helper fix lỗi Mixed Content và Link ảnh ---
+const getHttpsUrl = (url: string) => {
+  if (!url) return 'https://placehold.co/600x600?text=No+Image';
+  return url.replace('http://', 'https://');
+};
+
 // --- Component Card Sản phẩm Liên quan ---
-// (Tái sử dụng một phần logic từ trang Home)
 const RelatedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const router = useRouter();
+  
   const cardContent = (
     <Card
       hoverable
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      bodyStyle={{ flex: 1, padding: '16px' }}
+      styles={{ body: { padding: '12px', flex: 1, display: 'flex', flexDirection: 'column' } }}
+      style={{ height: '100%' }}
       cover={
-        <div style={{ aspectRatio: '1 / 1', position: 'relative' }}>
+        <div style={{ aspectRatio: '1 / 1', position: 'relative', overflow: 'hidden' }}>
           <Image
             alt={product.name}
-            src={product.image[0].url || 'https://placehold.co/300x300?text=Image'}
+            src={getHttpsUrl(product.image)}
             fill
-            style={{ objectFit: 'contain', padding: '8px' }}
-            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/300x300?text=Error'; }}
+            sizes="200px"
+            style={{ objectFit: 'cover' }}
           />
         </div>
       }
-      // Chuyển đến trang chi tiết mới khi click
       onClick={() => router.push(`/product/${product.id}`)} 
     >
-      <Title level={5} ellipsis={{ rows: 2, tooltip: product.name }}>
+      <Title level={5} ellipsis={{ rows: 2 }} style={{ fontSize: '0.9rem', marginBottom: 4 }}>
         {product.name}
       </Title>
-      <Text strong style={{ color: '#d70018', fontSize: '1rem' }}>
+      <Text strong style={{ color: '#d70018' }}>
         {product.price}
-      </Text>
-      <Text type="secondary" style={{ fontSize: '0.8rem', display: 'block' }}>
-        Đã bán {product.countSale > 1000 ? `${(product.countSale/1000).toFixed(1)}k` : product.countSale}
       </Text>
     </Card>
   );
   
   return product.discount ? (
-    <Badge.Ribbon text={`${product.discount}% Giảm`} color="red">
+    <Badge.Ribbon text={`-${product.discount}%`} color="red">
       {cardContent}
     </Badge.Ribbon>
   ) : (
@@ -89,167 +87,153 @@ function ProductDetailPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Lấy 'id' từ params
-  // API của bạn dùng ID dạng string (vd: -N_q...) chứ không phải số
   const id = params.id as string; 
 
-  // 1. Lấy chi tiết sản phẩm
+  // 1. Lấy chi tiết sản phẩm và danh sách liên quan
   useEffect(() => {
-    if (id) {
-      const fetchProductDetails = async () => {
-        setLoading(true);
-        try {
-          // Gọi API để lấy 1 sản phẩm
-          const response = await instance.get(`/product/${id}`);
-          setProduct(response.data);
-        } catch (error: any) {
-          console.error("Fetch detail error:", error);
-          message.error(error.response?.data?.message || 'Không thể tải chi tiết sản phẩm.');
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProductDetails();
-    }
-  }, [id]); // Chạy lại mỗi khi 'id' trên URL thay đổi
-
-  // 2. Lấy tất cả sản phẩm (để lọc sản phẩm liên quan)
-  useEffect(() => {
-    const fetchAllProducts = async () => {
+    const fetchData = async () => {
+      if (!id) return;
+      setLoading(true);
       try {
-        // Gọi API lấy tất cả sản phẩm
-        const response = await instance.get('/product');
-        setAllProducts(response.data || []);
-      } catch (error) {
-        console.error("Fetch all products error:", error);
-        // Không cần báo lỗi ở đây vì đây là phần phụ
+        // Gọi song song cả 2 API để tối ưu tốc độ
+        const [detailRes, allRes] = await Promise.all([
+          instance.get(`/product/${id}`),
+          instance.get('/product')
+        ]);
+
+        // Xử lý dữ liệu detail
+        const detailData = detailRes.data;
+        if (detailData) {
+            setProduct({
+                ...detailData,
+                image: typeof detailData.image === 'string' ? detailData.image : (detailData.image?.[0]?.url || '')
+            });
+        }
+
+        // Xử lý danh sách sản phẩm liên quan
+        const listData = Array.isArray(allRes.data) ? allRes.data : (allRes.data?.data || []);
+        setAllProducts(listData);
+
+      } catch (error: any) {
+        console.error("Fetch error:", error);
+        message.error('Không thể tải thông tin sản phẩm.');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchAllProducts();
-  }, []); // Chỉ chạy 1 lần
 
-  // 3. Lọc sản phẩm liên quan
+    fetchData();
+  }, [id]);
+
   const relatedProducts = useMemo(() => {
-    if (!product || allProducts.length === 0) return [];
-    // Lọc: cùng loại (type), khác ID (id), và lấy 5 sản phẩm đầu
+    if (!product || !allProducts.length) return [];
     return allProducts
       .filter(p => p.type === product.type && p.id !== product.id)
-      .slice(0, 5); 
+      .slice(0, 6); 
   }, [product, allProducts]);
 
-  // Lấy tên loại sản phẩm (vd: 'Affiliate')
   const productTypeName = productTypes.find(t => t.value === product?.type)?.label || 'Sản phẩm';
 
-  if (loading) {
-    return <Spin size="large" fullscreen />;
-  }
+  if (loading) return <Spin size="large" fullscreen tip="Đang tải chi tiết..." />;
 
   if (!product) {
     return (
-      <Row justify="center" align="middle" style={{ minHeight: '80vh' }}>
-        <Col>
-          <Title level={3}>Không tìm thấy sản phẩm</Title>
-          <Button type="primary" onClick={() => router.push('/')}>Về Trang chủ</Button>
-        </Col>
-      </Row>
+      <div style={{ textAlign: 'center', padding: '100px' }}>
+        <Title level={3}>Sản phẩm không tồn tại</Title>
+        <Button type="primary" onClick={() => router.push('/')}>Quay lại trang chủ</Button>
+      </div>
     );
   }
 
   return (
     <main className="max-w-screen-xl mx-auto p-4 md:p-8">
       <Breadcrumb
-        style={{ marginBottom: 16 }}
+        style={{ marginBottom: 24 }}
         items={[
-          { href: '/', title: <HomeOutlined /> },
+          { href: '/', title: <><HomeOutlined /> Trang chủ</> },
           { title: productTypeName },
           { title: product.name },
         ]}
       />
 
-      {/* === PHẦN 1: CHI TIẾT SẢN PHẨM === */}
-      <Card>
-        <Row gutter={[32, 32]}>
-          {/* Cột ảnh */}
-          <Col xs={24} md={10}>
-            <div style={{ aspectRatio: '1 / 1', position: 'relative', border: '1px solid #f0f0f0', borderRadius: '8px', overflow: 'hidden' }}>
+      <Row gutter={[32, 32]}>
+        {/* Cột ảnh */}
+        <Col xs={24} md={10}>
+          <Card styles={{ body: { padding: 8 } }}>
+            <div style={{ aspectRatio: '1 / 1', position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
               <Image
                 alt={product.name}
-                src={product.image[0].url || 'https://placehold.co/600x600?text=Image'}
+                src={getHttpsUrl(product.image)}
                 fill
-                style={{ objectFit: 'contain', padding: '16px' }}
-                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/600x600?text=Error'; }}
+                priority // Ưu tiên load ảnh này trước
+                style={{ objectFit: 'contain' }}
               />
             </div>
-          </Col>
-          
-          {/* Cột thông tin */}
-          <Col xs={24} md={14}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Tag icon={<TagOutlined />} color="blue">{productTypeName}</Tag>
-              
-              <Title level={2} style={{ margin: 0 }}>{product.name}</Title>
-              
-              <Space wrap split={<Divider type="vertical" />}>
+          </Card>
+        </Col>
+        
+        {/* Cột thông tin */}
+        <Col xs={24} md={14}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div>
+              <Tag color="blue" style={{ marginBottom: 8 }}>{productTypeName}</Tag>
+              <Title level={2} style={{ marginTop: 0 }}>{product.name}</Title>
+              <Space split={<Divider type="vertical" />}>
                 <Space>
                   <Text strong style={{ color: '#faad14', fontSize: '1.2rem' }}>{product.start}</Text>
                   <Rate allowHalf disabled defaultValue={product.start} />
                 </Space>
                 <Text type="secondary">{product.countEvaluate} Đánh giá</Text>
-                <Text type="secondary">{product.countSale > 1000 ? `${(product.countSale/1000).toFixed(1)}k` : product.countSale} Đã bán</Text>
+                <Text type="secondary">{product.countSale.toLocaleString()} Đã bán</Text>
               </Space>
-              
-              <div style={{ backgroundColor: '#fafafa', padding: '16px', borderRadius: '8px' }}>
-                <Title level={3} style={{ color: '#d70018', margin: 0 }}>
-                  {product.price}
-                </Title>
-                {product.discount && (
-                  <Text>Giảm giá {product.discount}%</Text>
-                )}
-              </div>
-              
-              <Button
-                type="primary"
-                danger
-                size="large"
-                icon={<ShoppingCartOutlined />}
-                style={{ width: '100%' }}
-                href={product.urlLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Đến nơi bán
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+            </div>
+            
+            <div style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '12px' }}>
+              <Title level={2} style={{ color: '#d70018', margin: 0 }}>
+                {product.price}
+              </Title>
+              {product.discount && <Tag color="red" style={{ marginTop: 8 }}>Giảm {product.discount}%</Tag>}
+            </div>
+            
+            <Button
+              type="primary"
+              danger
+              size="large"
+              block
+              icon={<ShoppingCartOutlined />}
+              style={{ height: '50px', fontSize: '1.1rem', fontWeight: 'bold' }}
+              href={product.urlLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              MUA NGAY TẠI NGUỒN
+            </Button>
+          </Space>
+        </Col>
+      </Row>
 
-      <Divider />
+      <Divider style={{ margin: '40px 0' }} />
 
-      {/* === PHẦN 2: MÔ TẢ SẢN PHẨM === */}
-      <Card>
-        <Title level={3}>MÔ TẢ SẢN PHẨM</Title>
-        <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-          {product.description || 'Chưa có mô tả cho sản phẩm này.'}
-        </Paragraph>
-      </Card>
+      <Row gutter={[32, 32]}>
+        <Col xs={24} lg={16}>
+          <Card title="MÔ TẢ SẢN PHẨM" bordered={false} className="shadow-sm">
+            <Paragraph style={{ whiteSpace: 'pre-wrap', fontSize: '1rem', lineHeight: '1.8' }}>
+              {product.description || 'Thông tin đang được cập nhật...'}
+            </Paragraph>
+          </Card>
+        </Col>
 
-      <Divider />
-
-      {/* === PHẦN 3: SẢN PHẨM LIÊN QUAN === */}
-      {relatedProducts.length > 0 && (
-        <Card>
-          <Title level={3}>SẢN PHẨM LIÊN QUAN</Title>
+        <Col xs={24} lg={8}>
+          <Title level={4} style={{ marginBottom: 20 }}>SẢN PHẨM LIÊN QUAN</Title>
           <Row gutter={[16, 16]}>
-            {relatedProducts.map(relProduct => { 
-              return(
-              <Col key={relProduct.id} xs={24} sm={12} md={8} lg={6} xl={4}>
+            {relatedProducts.map(relProduct => (
+              <Col key={relProduct.id} span={12}>
                 <RelatedProductCard product={relProduct} />
               </Col>
-            )})}
+            ))}
           </Row>
-        </Card>
-      )}
+        </Col>
+      </Row>
     </main>
   );
 }
